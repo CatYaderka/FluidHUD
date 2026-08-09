@@ -1,0 +1,267 @@
+<Window
+    x:Class="FluidHUD.Views.OverlayWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:FluidHUD.Controls"
+    xmlns:converters="using:FluidHUD.Converters">
+
+    <Grid
+        x:Name="WindowRoot"
+        Width="460"
+        Height="148"
+        Background="Transparent"
+        RequestedTheme="Dark">
+
+        <Grid.Resources>
+            <converters:BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+            <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVisibility" Invert="True" />
+            <LinearGradientBrush x:Key="FallbackArtworkBrush" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Offset="0" Color="#DB2C3856" />
+                <GradientStop Offset="0.48" Color="#C81D263D" />
+                <GradientStop Offset="1" Color="#E0121729" />
+            </LinearGradientBrush>
+        </Grid.Resources>
+
+        <Grid
+            x:Name="ScaleHost"
+            Width="460"
+            Height="148"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            PointerEntered="OnPointerEntered"
+            PointerExited="OnPointerExited">
+
+            <Border
+                x:Name="GlassBorder"
+                Background="#2E090F1C"
+                BorderThickness="0"
+                CornerRadius="20">
+
+                <Grid>
+                    <Image
+                        x:Name="NoiseTexture"
+                        Source="ms-appx:///Assets/noise.png"
+                        Stretch="UniformToFill"
+                        Opacity="0.01"
+                        IsHitTestVisible="False" />
+
+                    <Grid Padding="14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="84" />
+                            <RowDefinition Height="8" />
+                            <RowDefinition Height="28" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Cover and metadata live above the progress/status row. -->
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="84" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="86" />
+                            </Grid.ColumnDefinitions>
+
+                            <Border
+                                x:Name="AlbumArtHost"
+                                Grid.Column="0"
+                                Width="84"
+                                Height="84"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="{StaticResource FallbackArtworkBrush}"
+                                CornerRadius="14"
+                                PointerEntered="OnAlbumPointerEntered"
+                                PointerExited="OnAlbumPointerExited">
+                                <Grid>
+                                    <FontIcon
+                                        Glyph="&#xE8D6;"
+                                        FontFamily="Segoe Fluent Icons"
+                                        FontSize="28"
+                                        Foreground="#BFFFFFFF"
+                                        Visibility="{Binding HasArtwork, Converter={StaticResource InverseBoolToVisibility}}" />
+                                    <Image
+                                        Source="{Binding Artwork}"
+                                        Stretch="UniformToFill"
+                                        Visibility="{Binding HasArtwork, Converter={StaticResource BoolToVisibility}}" />
+
+                                    <Border
+                                        x:Name="CoverHoverOverlay"
+                                        Background="#72030812"
+                                        CornerRadius="14"
+                                        IsHitTestVisible="False"
+                                        Opacity="0" />
+
+                                    <Button
+                                        x:Name="CoverPlayPauseButton"
+                                        Width="40"
+                                        Height="40"
+                                        Padding="0"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Background="#B2172232"
+                                        BorderThickness="0"
+                                        CornerRadius="20"
+                                        IsHitTestVisible="False"
+                                        Opacity="0"
+                                        Click="OnPlayPauseClicked"
+                                        ToolTipService.ToolTip="Воспроизведение / пауза">
+                                        <FontIcon
+                                            Glyph="{Binding PlayPauseGlyph}"
+                                            FontFamily="Segoe Fluent Icons"
+                                            FontSize="15"
+                                            Foreground="White" />
+                                    </Button>
+                                </Grid>
+                            </Border>
+
+                            <Grid Grid.Column="1" Margin="12,5,10,2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="31" />
+                                    <RowDefinition Height="23" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <controls:MarqueeText
+                                    Height="29"
+                                    VerticalAlignment="Center"
+                                    FontSize="18"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource HudTextBrush}"
+                                    Text="{Binding Title}" />
+
+                                <TextBlock
+                                    Grid.Row="1"
+                                    VerticalAlignment="Top"
+                                    FontSize="12.5"
+                                    Foreground="{StaticResource HudSecondaryTextBrush}"
+                                    Text="{Binding Artist}"
+                                    TextTrimming="CharacterEllipsis" />
+
+                                <TextBlock
+                                    Grid.Row="2"
+                                    VerticalAlignment="Top"
+                                    FontSize="10.5"
+                                    Foreground="#78FFFFFF"
+                                    Text="{Binding AlbumTitle}"
+                                    TextTrimming="CharacterEllipsis" />
+                            </Grid>
+
+                            <Grid Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="34" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Button
+                                    Width="28"
+                                    Height="28"
+                                    Padding="0"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    CornerRadius="14"
+                                    Click="OnSettingsClicked"
+                                    ToolTipService.ToolTip="Настройки">
+                                    <FontIcon
+                                        Glyph="&#xE713;"
+                                        FontFamily="Segoe Fluent Icons"
+                                        FontSize="13"
+                                        Foreground="#BFFFFFFF" />
+                                </Button>
+
+                                <Border
+                                    x:Name="VolumePill"
+                                    Grid.Row="1"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Padding="8,5"
+                                    Background="#1CFFFFFF"
+                                    CornerRadius="12"
+                                    Visibility="{Binding IsVolumeVisible, Converter={StaticResource BoolToVisibility}}">
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <FontIcon
+                                            Glyph="{Binding VolumeGlyph}"
+                                            FontFamily="Segoe Fluent Icons"
+                                            FontSize="11"
+                                            Foreground="White" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="10.5"
+                                            Foreground="White"
+                                            Text="{Binding VolumeText}" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Grid>
+
+                        <!-- Previous and Next flank the progress/status line. -->
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="30" />
+                            </Grid.ColumnDefinitions>
+
+                            <Button
+                                Grid.Column="0"
+                                Width="28"
+                                Height="28"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="#12FFFFFF"
+                                BorderThickness="0"
+                                CornerRadius="14"
+                                Click="OnPreviousClicked"
+                                ToolTipService.ToolTip="Предыдущий трек">
+                                <FontIcon Glyph="&#xE892;" FontFamily="Segoe Fluent Icons" FontSize="12" />
+                            </Button>
+
+                            <Grid Grid.Column="1" Margin="9,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="16" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <controls:SeekBar
+                                    x:Name="TrackSeekBar"
+                                    Height="16"
+                                    VerticalAlignment="Center"
+                                    AccentBrush="{Binding AccentBrush}"
+                                    IsEnabled="{Binding HasTimeline}"
+                                    Value="{Binding ProgressValue}"
+                                    SeekRequested="OnSeekRequested" />
+                                <Grid Grid.Row="1" Margin="0,0,0,0">
+                                    <TextBlock
+                                        HorizontalAlignment="Left"
+                                        FontSize="9.5"
+                                        Foreground="#72FFFFFF"
+                                        Text="{Binding ElapsedText}" />
+                                    <TextBlock
+                                        HorizontalAlignment="Right"
+                                        FontSize="9.5"
+                                        Foreground="#72FFFFFF"
+                                        Text="{Binding DurationText}" />
+                                </Grid>
+                            </Grid>
+
+                            <Button
+                                Grid.Column="2"
+                                Width="28"
+                                Height="28"
+                                Padding="0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Background="#12FFFFFF"
+                                BorderThickness="0"
+                                CornerRadius="14"
+                                Click="OnNextClicked"
+                                ToolTipService.ToolTip="Следующий трек">
+                                <FontIcon Glyph="&#xE893;" FontFamily="Segoe Fluent Icons" FontSize="12" />
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

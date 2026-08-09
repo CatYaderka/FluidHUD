@@ -1,0 +1,40 @@
+<Application
+    x:Class="FluidHUD.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Color x:Key="HudTextColor">#FFF8FAFF</Color>
+            <Color x:Key="HudSecondaryTextColor">#B8DDE5F2</Color>
+            <SolidColorBrush x:Key="HudTextBrush" Color="{StaticResource HudTextColor}" />
+            <SolidColorBrush x:Key="HudSecondaryTextBrush" Color="{StaticResource HudSecondaryTextColor}" />
+            <SolidColorBrush x:Key="HudControlBrush" Color="#24FFFFFF" />
+            <SolidColorBrush x:Key="HudControlHoverBrush" Color="#3DFFFFFF" />
+
+            <Style x:Key="HudIconButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="34" />
+                <Setter Property="Height" Value="34" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="CornerRadius" Value="17" />
+                <Setter Property="Background" Value="{StaticResource HudControlBrush}" />
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+            </Style>
+
+            <Style x:Key="SettingsCardStyle" TargetType="Border">
+                <Setter Property="CornerRadius" Value="16" />
+                <Setter Property="Padding" Value="18" />
+                <Setter Property="Background" Value="#12FFFFFF" />
+                <Setter Property="BorderBrush" Value="#20FFFFFF" />
+                <Setter Property="BorderThickness" Value="1" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

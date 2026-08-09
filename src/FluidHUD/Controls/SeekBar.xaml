@@ -1,0 +1,56 @@
+<UserControl
+    x:Class="FluidHUD.Controls.SeekBar"
+    x:Name="SeekControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid
+        x:Name="InteractionRoot"
+        Height="16"
+        Background="Transparent"
+        PointerEntered="OnPointerEntered"
+        PointerExited="OnPointerExited"
+        PointerPressed="OnPointerPressed"
+        PointerMoved="OnPointerMoved"
+        PointerReleased="OnPointerReleased"
+        PointerCanceled="OnPointerCanceled"
+        PointerCaptureLost="OnPointerCaptureLost">
+
+        <Border
+            Height="3"
+            VerticalAlignment="Center"
+            Background="#28FFFFFF"
+            CornerRadius="2" />
+
+        <Border
+            x:Name="ProgressFill"
+            Width="0"
+            Height="3"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            Background="{Binding AccentBrush, ElementName=SeekControl}"
+            CornerRadius="2" />
+
+        <!-- The host is translated; only the inner dot is scaled on hover. -->
+        <Grid
+            x:Name="ThumbHost"
+            Width="14"
+            Height="14"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center">
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="ThumbTranslation" />
+            </Grid.RenderTransform>
+
+            <Border
+                x:Name="Thumb"
+                Width="7"
+                Height="7"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{Binding AccentBrush, ElementName=SeekControl}"
+                CornerRadius="4"
+                Opacity="0.62" />
+        </Grid>
+    </Grid>
+</UserControl>
