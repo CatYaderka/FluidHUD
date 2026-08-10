@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Политика конфиденциальности FluidHUD / FluidHUD Privacy Policy">
+<title>FluidHUD — Политика конфиденциальности</title>
+<style>
+:root{color-scheme:dark;--bg:#07101d;--card:#0f1929;--text:#edf5ff;--muted:#aebed2;--line:#24334a;--accent:#62caff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(900px 500px at 80% -10%,#17345c 0,transparent 65%),var(--bg);color:var(--text);font:16px/1.7 system-ui,"Segoe UI",sans-serif}main{width:min(900px,calc(100% - 32px));margin:48px auto 90px}.hero,.policy{background:rgba(15,25,41,.86);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 70px #0005;backdrop-filter:blur(18px)}.hero{padding:34px 38px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:14px}.mark{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#20304d,#11192c);position:relative;overflow:hidden;box-shadow:0 0 28px #40bfff33}.mark:before,.mark:after{content:"";position:absolute;width:70px;height:12px;left:-12px;border-radius:50%;filter:blur(2px);transform:rotate(-7deg)}.mark:before{top:21px;background:#35d4ff}.mark:after{top:29px;background:#7758ff}.brand b{font-size:23px}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.15;margin:28px 0 8px}.meta{color:var(--muted)}nav{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}nav a{color:#cdeeff;text-decoration:none;border:1px solid #5acbff55;border-radius:999px;padding:6px 14px}.policy{padding:34px 38px;margin-top:20px}h2{font-size:26px;margin:32px 0 8px}h3{font-size:19px;margin:27px 0 6px;color:#d9efff}p,li{color:#d5e0ee}ul{padding-left:24px}code,pre{font-family:ui-monospace,Consolas,monospace}pre{padding:14px 16px;border-radius:12px;background:#07101b;border:1px solid #203049;color:#bfe8ff;overflow:auto}.notice{border-left:3px solid var(--accent);padding:10px 16px;background:#13243a;border-radius:0 12px 12px 0}.divider{height:1px;background:var(--line);margin:48px 0}.en{scroll-margin-top:20px}footer{text-align:center;color:#778ba5;margin-top:30px}@media(max-width:600px){main{margin-top:18px}.hero,.policy{padding:24px 20px;border-radius:16px}h2{font-size:23px}}
+</style>
+</head>
+<body>
+<main>
+<section class="hero">
+<div class="brand"><span class="mark"></span><b>FluidHUD</b></div>
+<h1>Политика конфиденциальности</h1>
+<div class="meta">Дата вступления в силу: 10 августа 2026 года · Версия 1.0 · Разработчик: CatYaderka</div>
+<nav><a href="#ru">Русский</a><a href="#en">English</a></nav>
+</section>
+
+<article class="policy" id="ru">
+<h2>1. Общие положения</h2>
+<p>Настоящая Политика конфиденциальности описывает, какие данные обрабатывает приложение FluidHUD и как они используются.</p>
+<p>FluidHUD — локальный системный media-overlay для Windows 10 и Windows 11. Приложение не требует регистрации, не содержит рекламы и не использует облачные сервисы разработчика.</p>
+
+<h2>2. Данные, обрабатываемые приложением</h2>
+<p>FluidHUD обрабатывает только данные, необходимые для работы заявленных функций:</p>
+<ul><li>название текущего трека;</li><li>имя исполнителя и название альбома;</li><li>обложку трека;</li><li>состояние воспроизведения, позицию и длительность;</li><li>идентификатор приложения, предоставившего Windows media session;</li><li>состояние общей громкости и отключения звука;</li><li>пользовательские настройки: горячую клавишу, прозрачность, положение, время показа, скорость анимации и настройку автозапуска.</li></ul>
+<p>Медиа-данные предоставляются локальными API Windows — Global System Media Transport Controls и Windows Core Audio.</p>
+
+<h2>3. Цель обработки</h2>
+<p>Данные используются исключительно для отображения информации о текущем треке, выполнения команд Play/Pause, Previous, Next и Seek по прямому действию пользователя, отображения общей громкости, применения настроек и опционального запуска вместе с Windows.</p>
+
+<h2>4. Передача и продажа данных</h2>
+<p class="notice">FluidHUD не отправляет медиа-данные, настройки или диагностическую информацию на серверы разработчика или третьих лиц.</p>
+<p>Разработчик не продаёт, не сдаёт в аренду и не передаёт пользовательские данные. В приложении отсутствуют аналитика, рекламные SDK, трекеры, cookies и телеметрия разработчика.</p>
+<p>Microsoft Store и Windows могут самостоятельно обрабатывать сведения об установке, обновлении и стабильности приложения в соответствии с политикой конфиденциальности Microsoft. Разработчик FluidHUD не управляет этой обработкой.</p>
+
+<h2>5. Локальное хранение</h2>
+<p>Настройки и журнал необработанных ошибок могут храниться в локальном профиле пользователя:</p>
+<pre>%LocalAppData%\FluidHUD\settings.json
+%LocalAppData%\FluidHUD\FluidHUD.log</pre>
+<p>Обложки кэшируются только в оперативной памяти и удаляются при завершении процесса. Локальные файлы сохраняются до удаления пользователем, очистки папки или удаления приложения.</p>
+
+<h2>6. Диагностический журнал</h2>
+<p>FluidHUD может создать локальный журнал при необработанной ошибке. Он содержит техническое описание исключения и не отправляется автоматически. Пользователь самостоятельно решает, передавать ли журнал при обращении в поддержку.</p>
+
+<h2>7. Разрешения и runFullTrust</h2>
+<p>FluidHUD использует <code>runFullTrust</code> для регистрации выбранной пользователем глобальной горячей клавиши, управления borderless/topmost окном, чтения локальной Windows media session, получения уведомлений Core Audio и выполнения пользовательских команд воспроизведения.</p>
+<p><code>runFullTrust</code> не используется для повышения прав администратора, установки служб или драйверов, записи звука, внедрения кода, чтения произвольных файлов или скрытого перехвата клавиатуры.</p>
+
+<h2>8. Автозапуск</h2>
+<p>Автозапуск выключен по умолчанию и включается только пользователем. Store/MSIX версия использует стандартный Windows StartupTask. Пользователь может отключить его в FluidHUD, Параметрах Windows или Диспетчере задач.</p>
+
+<h2>9. Дети</h2>
+<p>FluidHUD не предназначен специально для детей и сознательно не собирает персональные данные детей или иных пользователей.</p>
+
+<h2>10. Безопасность и права пользователя</h2>
+<p>Данные обрабатываются локально. Пользователь может отключить автозапуск, изменить настройки, удалить локальные файлы или прекратить обработку, завершив либо удалив FluidHUD. У разработчика отсутствует удалённая пользовательская база данных.</p>
+
+<h2>11. Изменения политики</h2>
+<p>Политика может обновляться при изменении функций FluidHUD или применимых требований. Актуальная версия публикуется по тому же адресу с новой датой вступления в силу.</p>
+
+<h2>12. Контакты</h2>
+<p>По вопросам конфиденциальности свяжитесь с CatYaderka через контактные данные поддержки на странице FluidHUD в Microsoft Store.</p>
+
+<div class="divider"></div>
+<section class="en" id="en">
+<h1>FluidHUD Privacy Policy</h1>
+<p class="meta">Effective date: August 10, 2026 · Version 1.0 · Developer: CatYaderka</p>
+<h2>1. Overview</h2><p>FluidHUD is a local Windows 10/11 desktop media overlay. It requires no account, contains no advertising, and uses no developer-operated cloud services.</p>
+<h2>2. Information processed</h2><p>FluidHUD processes only the active track title, artist, album, artwork, playback state, position, duration, source application identifier, master-volume state, and user-selected FluidHUD settings. This information is supplied locally by Windows GSMTC and Core Audio.</p>
+<h2>3. Purpose</h2><p>The information is used only to display and control the active media session, show volume state, apply preferences, and optionally start FluidHUD with Windows when explicitly enabled.</p>
+<h2>4. Sharing and sale</h2><p class="notice">FluidHUD does not transmit media information, settings, or diagnostics to developer or third-party servers.</p><p>The app contains no analytics, advertising SDKs, trackers, cookies, or developer telemetry. Microsoft Store and Windows may process installation, update, and reliability information under Microsoft's own privacy terms.</p>
+<h2>5. Local storage</h2><pre>%LocalAppData%\FluidHUD\settings.json
+%LocalAppData%\FluidHUD\FluidHUD.log</pre><p>Artwork is cached in memory only. Local files remain until deleted by the user, their folder is cleared, or the app is removed.</p>
+<h2>6. Diagnostics</h2><p>An unhandled-error log may be created locally. It is never uploaded automatically. The user decides whether to inspect, delete, or voluntarily provide it to support.</p>
+<h2>7. Permissions and runFullTrust</h2><p><code>runFullTrust</code> is used for a user-selected global shortcut, the borderless/topmost desktop window, local Windows media sessions, Core Audio notifications, and user-requested playback commands. It is not used for administrator elevation, services, drivers, audio recording, code injection, arbitrary file access, or arbitrary keyboard capture.</p>
+<h2>8. Startup</h2><p>Startup is disabled by default and enabled only by the user through the standard Windows StartupTask mechanism.</p>
+<h2>9. Children</h2><p>FluidHUD is not specifically directed at children and does not knowingly collect personal information.</p>
+<h2>10. User choices</h2><p>Users may disable startup, reset settings, delete local files, or stop all processing by closing or uninstalling FluidHUD. The developer maintains no remote user database.</p>
+<h2>11. Changes</h2><p>The current policy will remain available at this URL with its effective date shown above.</p>
+<h2>12. Contact</h2><p>For privacy questions, contact CatYaderka through the support information on the FluidHUD Microsoft Store page.</p>
+</section>
+</article>
+<footer>FluidHUD · CatYaderka · Privacy Policy</footer>
+</main>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a28f08697b3cec4e',t:'MTc4NjM2NTI0Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f"}' crossorigin="anonymous"></script>
+</body>
+</html>
