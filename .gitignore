@@ -1,0 +1,13 @@
+.vs/
+bin/
+obj/
+release/
+*.user
+*.suo
+*.nupkg
+
+settings.json
+*.log
+
+Thumbs.db
+.DS_Store
