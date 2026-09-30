@@ -43,6 +43,7 @@ internal static class NativeMethods
     internal const int DwmwcDoNotRound = 1;
     internal const int DwmwcRound = 2;
     internal const int DwmColorNone = unchecked((int)0xFFFFFFFE);
+    internal const uint MbIconError = 0x00000010;
     internal const uint DwmBbEnable = 0x00000001;
     internal const uint DwmBbBlurRegion = 0x00000002;
 
@@ -111,6 +112,9 @@ internal static class NativeMethods
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     internal static extern nint SendMessage(nint hWnd, uint message, nint wParam, nint lParam);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    internal static extern int MessageBox(nint hWnd, string text, string caption, uint type);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

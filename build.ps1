@@ -4,7 +4,10 @@ param(
     [string]$Configuration = 'Release',
 
     [ValidateSet('x64', 'x86', 'ARM64')]
-    [string]$Platform = 'x64'
+    [string]$Platform = 'x64',
+
+    [ValidatePattern('^[A-Za-z0-9._-]+$')]
+    [string]$OutputName = 'FluidHUD'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,7 +15,7 @@ $root = $PSScriptRoot
 $project = Join-Path $root 'src\FluidHUD\FluidHUD.csproj'
 $releaseRoot = Join-Path $root 'release'
 $temporaryOutput = Join-Path $releaseRoot '.publish'
-$finalExecutable = Join-Path $releaseRoot 'FluidHUD.exe'
+$finalExecutable = Join-Path $releaseRoot "$OutputName.exe"
 $rid = switch ($Platform) {
     'x86'   { 'win-x86' }
     'ARM64' { 'win-arm64' }
@@ -34,6 +37,7 @@ dotnet publish $project `
     --runtime $rid `
     --self-contained true `
     -p:Platform=$Platform `
+    -p:AssemblyName=$OutputName `
     -p:EnableMsixTooling=true `
     -p:PublishSingleFile=true `
     -p:IncludeNativeLibrariesForSelfExtract=true `
@@ -44,9 +48,9 @@ dotnet publish $project `
 
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-$publishedExe = Join-Path $temporaryOutput 'FluidHUD.exe'
+$publishedExe = Join-Path $temporaryOutput "$OutputName.exe"
 if (-not (Test-Path $publishedExe)) {
-    throw 'Publish completed without FluidHUD.exe.'
+    throw "Publish completed without $OutputName.exe."
 }
 
 $externalFiles = @(

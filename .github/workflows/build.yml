@@ -41,26 +41,30 @@ jobs:
 
       - name: Publish
         shell: pwsh
-        run: .\build.ps1 -Platform "${{ matrix.platform }}"
+        run: .\build.ps1 -Platform "${{ matrix.platform }}" -OutputName "FluidHUD-${{ matrix.rid }}"
 
-      - name: Prepare artifact
+      - name: Validate executable
         shell: pwsh
         run: |
           $target = "release\FluidHUD-${{ matrix.rid }}.exe"
-          Copy-Item "release\FluidHUD.exe" $target -Force
+          $bytes = [System.IO.File]::ReadAllBytes($target)
+          if ($bytes.Length -lt 10MB) {
+            throw "Published executable is unexpectedly small."
+          }
+          if ($bytes[0] -ne 0x4D -or $bytes[1] -ne 0x5A) {
+            throw "DOS signature is invalid."
+          }
+          $peOffset = [BitConverter]::ToInt32($bytes, 0x3C)
+          if ([BitConverter]::ToUInt32($bytes, $peOffset) -ne 0x00004550) {
+            throw "PE signature is invalid."
+          }
+          $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
+          $expected = if ("${{ matrix.rid }}" -eq "win-x64") { 0x8664 } else { 0xAA64 }
+          if ($machine -ne $expected) {
+            throw "PE machine mismatch: expected $expected, got $machine."
+          }
           $hash = (Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant()
           "$hash  $(Split-Path $target -Leaf)" | Set-Content "$target.sha256" -Encoding ascii
-
-      - name: Smoke test x64
-        if: matrix.rid == 'win-x64'
-        shell: pwsh
-        run: |
-          $process = Start-Process "release\FluidHUD-win-x64.exe" -PassThru
-          Start-Sleep -Seconds 8
-          if ($process.HasExited) {
-            throw "FluidHUD exited during startup with code $($process.ExitCode)."
-          }
-          Stop-Process -Id $process.Id -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

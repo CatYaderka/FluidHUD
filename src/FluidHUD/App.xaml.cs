@@ -1,3 +1,4 @@
+using FluidHUD.Interop;
 using FluidHUD.Models;
 using FluidHUD.Services;
 using FluidHUD.Views;
@@ -85,6 +86,12 @@ public partial class App : Application
         catch (Exception ex)
         {
             TryWriteCrashLog(ex);
+            var logPath = Path.Combine(_settingsService.SettingsDirectory, "FluidHUD.log");
+            _ = NativeMethods.MessageBox(
+                _overlayWindow?.Hwnd ?? nint.Zero,
+                $"FluidHUD не удалось запустить.\n\n{ex.Message}\n\nПодробности: {logPath}",
+                "FluidHUD",
+                NativeMethods.MbIconError);
             Shutdown();
         }
     }
