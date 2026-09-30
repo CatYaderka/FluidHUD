@@ -59,8 +59,6 @@ public sealed partial class MarqueeText : UserControl
             return;
         }
 
-        // Explicit widths prevent Grid/StackPanel from arranging the moving text
-        // to viewport width and trimming it before translation.
         MovingText1.Width = textWidth;
         MovingText2.Width = textWidth;
         var distance = textWidth + MarqueeGap.Width;

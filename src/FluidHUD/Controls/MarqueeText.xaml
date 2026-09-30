@@ -4,8 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid x:Name="Viewport" IsHitTestVisible="False">
-        <!-- Ellipsis is used only while the text fits or before marquee starts. -->
-        <TextBlock
+<TextBlock
             x:Name="StaticText"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
@@ -17,9 +16,7 @@
             Text="{x:Bind Text, Mode=OneWay}"
             TextTrimming="CharacterEllipsis"
             TextWrapping="NoWrap" />
-
-        <!-- Two complete copies form a seamless loop. Moving text is never trimmed. -->
-        <StackPanel
+<StackPanel
             x:Name="MarqueeStrip"
             HorizontalAlignment="Left"
             VerticalAlignment="Center"

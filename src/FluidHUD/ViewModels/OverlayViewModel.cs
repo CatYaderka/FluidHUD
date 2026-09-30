@@ -120,8 +120,6 @@ public sealed class OverlayViewModel : ObservableObject, IDisposable
         HasTimeline = snapshot.HasTimeline;
         UpdateProgress();
 
-        // Keep the previous cover while the new GSMTC thumbnail is still being
-        // published. A final null (after the retry grace period) clears it.
         if (snapshot.ArtworkPending && snapshot.ArtworkBytes is null) return;
         if (!artworkChanged) return;
         _artworkBytesReference = snapshot.ArtworkBytes;

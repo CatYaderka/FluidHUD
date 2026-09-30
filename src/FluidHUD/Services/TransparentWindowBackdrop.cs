@@ -6,11 +6,6 @@ using Windows.UI;
 
 namespace FluidHUD.Services;
 
-/// <summary>
-/// A fully transparent composition backdrop. It enables per-pixel alpha for the
-/// HWND without asking DWM to render Acrylic/Mica, so there is no system blur
-/// surface that can flash before the animated XAML card.
-/// </summary>
 public sealed class TransparentWindowBackdrop : SystemBackdrop, IDisposable
 {
     private static readonly object CompositorGate = new();

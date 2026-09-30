@@ -17,8 +17,7 @@ public sealed record HotkeyGesture
 {
     public HotkeyModifiers Modifiers { get; init; } = HotkeyModifiers.Alt;
 
-    /// <summary>A Win32 virtual-key code.</summary>
-    public uint VirtualKey { get; init; } = 0x20; // Space
+    public uint VirtualKey { get; init; } = 0x20;
 
     [JsonIgnore]
     public bool IsValid => VirtualKey is > 0 and <= 0xFE;

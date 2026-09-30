@@ -51,9 +51,7 @@
                             <RowDefinition Height="8" />
                             <RowDefinition Height="28" />
                         </Grid.RowDefinitions>
-
-                        <!-- Cover and metadata live above the progress/status row. -->
-                        <Grid Grid.Row="0">
+<Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="84" />
                                 <ColumnDefinition Width="*" />
@@ -193,9 +191,7 @@
                                 </Border>
                             </Grid>
                         </Grid>
-
-                        <!-- Previous and Next flank the progress/status line. -->
-                        <Grid Grid.Row="2">
+<Grid Grid.Row="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="30" />
                                 <ColumnDefinition Width="*" />

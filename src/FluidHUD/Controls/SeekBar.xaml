@@ -30,9 +30,7 @@
             VerticalAlignment="Center"
             Background="{Binding AccentBrush, ElementName=SeekControl}"
             CornerRadius="2" />
-
-        <!-- The host is translated; only the inner dot is scaled on hover. -->
-        <Grid
+<Grid
             x:Name="ThumbHost"
             Width="14"
             Height="14"

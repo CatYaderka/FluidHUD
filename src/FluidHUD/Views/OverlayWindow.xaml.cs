@@ -64,8 +64,6 @@ public sealed partial class OverlayWindow : Window, IDisposable
         WindowHelpers.ConfigureBorderless(this, showInSwitcher: false, resizable: false);
         WindowHelpers.DisableDwmNonClientRendering(this);
 
-        // No Acrylic/Mica is attached to the HUD. A transparent composition
-        // backdrop cannot flash a blurred rectangle before the XAML animation.
         WindowHelpers.EnableTransparentComposition(this);
         WindowHelpers.DisableDwmNonClientRendering(this);
         _transparentBackdrop = new TransparentWindowBackdrop();
@@ -200,9 +198,6 @@ public sealed partial class OverlayWindow : Window, IDisposable
         if (_disposed) return;
         if (!_initialized) InitializeHidden();
 
-        // A media/volume event while the HUD is already visible must only extend
-        // its lifetime. Restarting Scale/Fade makes the player jump and resets
-        // the perceived playback state.
         if (_isVisible)
         {
             _shownAt = DateTimeOffset.UtcNow;
@@ -211,9 +206,6 @@ public sealed partial class OverlayWindow : Window, IDisposable
 
             if (_isHiding)
             {
-                // A new track arrived while this same HWND was fading out.
-                // Cancel that batch and restore the existing card; never create
-                // a second show transition or a phantom-looking duplicate.
                 Interlocked.Increment(ref _animationVersion);
                 _isHiding = false;
                 EnsureCompositionObjects();
@@ -406,11 +398,29 @@ public sealed partial class OverlayWindow : Window, IDisposable
     {
         if (_hWnd == 0) return;
 
-        var scale = WindowHelpers.GetScale(_hWnd);
+        var targetHwnd = NativeMethods.GetForegroundWindow();
+        if (targetHwnd == 0 || targetHwnd == _hWnd) targetHwnd = _hWnd;
+
+        var scale = WindowHelpers.GetScale(targetHwnd);
         var width = (int)Math.Round(WidthInDips * scale);
         var height = (int)Math.Round(HeightInDips * scale);
         var margin = (int)Math.Round(_settings.ScreenMargin * scale);
-        var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
+        DisplayArea displayArea;
+        try
+        {
+            var targetWindowId = targetHwnd == _hWnd
+                ? _appWindow.Id
+                : Microsoft.UI.Win32Interop.GetWindowIdFromWindow(targetHwnd);
+            displayArea = DisplayArea.GetFromWindowId(
+                targetWindowId,
+                DisplayAreaFallback.Nearest);
+        }
+        catch
+        {
+            displayArea = DisplayArea.GetFromWindowId(
+                _appWindow.Id,
+                DisplayAreaFallback.Primary);
+        }
         var workArea = displayArea.WorkArea;
         var x = workArea.X + Math.Max(0, (workArea.Width - width) / 2);
         var y = _settings.Placement == OverlayPlacement.TopCenter
@@ -503,7 +513,6 @@ public sealed partial class OverlayWindow : Window, IDisposable
 
         if (!_hideOnDeactivate) return;
 
-        // Avoid treating activation hand-off during ShowWindow as an outside click.
         if (DateTimeOffset.UtcNow - _shownAt > TimeSpan.FromMilliseconds(220))
         {
             HideAnimated();

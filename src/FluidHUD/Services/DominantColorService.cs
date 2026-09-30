@@ -52,7 +52,6 @@ public sealed class DominantColorService
 
     private static Color ExtractWeightedColor(byte[] pixels)
     {
-        // Quantized buckets avoid muddy averaging while remaining dependency-free.
         var buckets = new Dictionary<int, (double Weight, double R, double G, double B)>();
 
         for (var index = 0; index + 3 < pixels.Length; index += 4)
@@ -94,7 +93,6 @@ public sealed class DominantColorService
         var green = (byte)Math.Clamp(Math.Round(winner.G / winner.Weight), 0, 255);
         var blue = (byte)Math.Clamp(Math.Round(winner.B / winner.Weight), 0, 255);
 
-        // Lift very dark artwork colors so progress and Play accents remain visible.
         var peak = Math.Max(red, Math.Max(green, blue));
         if (peak < 112)
         {

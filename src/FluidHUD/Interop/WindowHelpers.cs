@@ -53,11 +53,6 @@ internal static class WindowHelpers
         }
     }
 
-    /// <summary>
-    /// Removes the Win32 non-client frame in addition to the AppWindow presenter.
-    /// Some Windows builds retain a one-pixel light frame until the style change
-    /// is committed through SWP_FRAMECHANGED.
-    /// </summary>
     internal static void RemoveSystemFrame(Window window)
     {
         var hWnd = GetHwnd(window);
@@ -109,10 +104,6 @@ internal static class WindowHelpers
             sizeof(int));
     }
 
-    /// <summary>
-    /// The overlay draws its own rounded XAML surface, so DWM non-client
-    /// rendering (frame, shadow and outer rounding) must be disabled entirely.
-    /// </summary>
     internal static void DisableDwmNonClientRendering(Window window)
     {
         var hWnd = GetHwnd(window);
@@ -149,11 +140,6 @@ internal static class WindowHelpers
             sizeof(int));
     }
 
-    /// <summary>
-    /// Enables per-pixel alpha without enabling a visible DWM blur region.
-    /// The tiny region is outside the client area and is used only to opt the
-    /// HWND into transparent composition.
-    /// </summary>
     internal static void EnableTransparentComposition(Window window)
     {
         var hWnd = GetHwnd(window);

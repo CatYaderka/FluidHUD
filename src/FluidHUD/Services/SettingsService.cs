@@ -89,7 +89,6 @@ public sealed class SettingsService
         }
         catch
         {
-            // A broken config must never prevent the overlay from starting.
         }
     }
 }

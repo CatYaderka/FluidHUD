@@ -18,6 +18,8 @@ public partial class App : Application
     private OverlayWindow? _overlayWindow;
     private SettingsWindow? _settingsWindow;
     private HotkeyService? _hotkeyService;
+    private Mutex? _singleInstanceMutex;
+    private bool _ownsSingleInstanceMutex;
     private bool _isShuttingDown;
 
     public App()
@@ -28,12 +30,19 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
+        if (!TryAcquireSingleInstance())
+        {
+            Environment.Exit(0);
+            return;
+        }
+
         try
         {
             _settings = await _settingsService.LoadAsync();
             try
             {
-                _startupService.SetEnabled(_settings.StartWithWindows);
+                _settings.StartWithWindows = _startupService.Initialize(
+                    _settings.StartWithWindows);
             }
             catch (Exception startupError)
             {
@@ -77,6 +86,22 @@ public partial class App : Application
         {
             TryWriteCrashLog(ex);
             Shutdown();
+        }
+    }
+
+    private bool TryAcquireSingleInstance()
+    {
+        try
+        {
+            _singleInstanceMutex = new Mutex(
+                initiallyOwned: true,
+                name: @"Local\CatYaderka.FluidHUD",
+                createdNew: out _ownsSingleInstanceMutex);
+            return _ownsSingleInstanceMutex;
+        }
+        catch
+        {
+            return true;
         }
     }
 
@@ -183,7 +208,6 @@ public partial class App : Application
 
         _overlayWindow?.ApplySettings(_settings);
 
-        // Do not leave an invisible process with no usable global shortcut.
         if (!_settings.OnboardingCompleted || _hotkeyService?.RegisteredGesture is null)
         {
             Shutdown();
@@ -237,13 +261,21 @@ public partial class App : Application
         try { _overlayWindow?.CloseForShutdown(); } catch { }
         _settingsWindow = null;
         _overlayWindow = null;
+
+        if (_ownsSingleInstanceMutex)
+        {
+            try { _singleInstanceMutex?.ReleaseMutex(); }
+            catch { }
+        }
+        _singleInstanceMutex?.Dispose();
+        _singleInstanceMutex = null;
+        _ownsSingleInstanceMutex = false;
         Exit();
     }
 
     private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         TryWriteCrashLog(e.Exception);
-        // Leave Handled=false: continuing after a corrupted composition/UI state is unsafe.
     }
 
     private void TryWriteCrashLog(Exception exception)
@@ -257,7 +289,6 @@ public partial class App : Application
         }
         catch
         {
-            // Logging must not mask the original failure.
         }
     }
 }

@@ -2,15 +2,16 @@ using Microsoft.Win32;
 
 namespace FluidHUD.Services;
 
-/// <summary>
-/// Registers FluidHUD for the current user only. No elevation and no scheduled
-/// task are required; moving the executable is handled by refreshing the value
-/// on every successful settings save and application launch.
-/// </summary>
 public sealed class StartupService
 {
     private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string ValueName = "FluidHUD";
+
+    public bool Initialize(bool configuredValue)
+    {
+        SetEnabled(configuredValue);
+        return configuredValue;
+    }
 
     public void SetEnabled(bool enabled)
     {
@@ -29,9 +30,6 @@ public sealed class StartupService
             throw new InvalidOperationException("Не удалось определить путь к FluidHUD.exe.");
         }
 
-        key.SetValue(
-            ValueName,
-            $"\"{executablePath}\"",
-            RegistryValueKind.String);
+        key.SetValue(ValueName, $"\"{executablePath}\"", RegistryValueKind.String);
     }
 }

@@ -201,9 +201,6 @@ public sealed class MediaSessionService : IDisposable
                 }
                 else
                 {
-                    // Session can be null briefly while a player switches tracks.
-                    // Keep the previous card for at least five seconds and tell
-                    // a visible HUD to extend its timer without changing data.
                     Publish(_lastSnapshot, MediaChangeKind.Refreshing);
                     ScheduleUnavailableGrace();
                 }
@@ -251,17 +248,12 @@ public sealed class MediaSessionService : IDisposable
             var refreshArtworkFromSource = forceArtworkRefresh ||
                 requestedKind is MediaChangeKind.Track or MediaChangeKind.Session;
 
-            // MediaPropertiesChanged can be raised first with a placeholder and
-            // then again with the real cover. Do not let an early cached image
-            // permanently win for the same title/artist identity.
             if (refreshArtworkFromSource && mediaProperties.Thumbnail is not null)
             {
                 artworkBytes = await ReadArtworkAsync(mediaProperties.Thumbnail, cancellationToken);
                 artworkLoadedFromSource = artworkBytes is { Length: > 0 };
             }
 
-            // During a forced retry, keep null if the OS stream still isn't ready;
-            // falling back to the old cache here would stop all subsequent retries.
             if (artworkBytes is null && !forceArtworkRefresh)
             {
                 _ = _artworkCache.TryGet(identity, out artworkBytes);
@@ -322,11 +314,9 @@ public sealed class MediaSessionService : IDisposable
         }
         catch (OperationCanceledException)
         {
-            // A more recent media event superseded this refresh.
         }
         catch
         {
-            // Media applications can disappear between any two GSMTC calls.
             if (!cancellationToken.IsCancellationRequested)
             {
                 Publish(_lastSnapshot, _lastSnapshot is null
@@ -364,8 +354,6 @@ public sealed class MediaSessionService : IDisposable
                 var current = _lastSnapshot;
                 if (current is null || current.TrackIdentity != trackIdentity) return;
 
-                // Timeline kind keeps the update silent: the ViewModel receives
-                // the late artwork, but the HUD is not shown again as a new track.
                 await RefreshAsync(
                     MediaChangeKind.Timeline,
                     source.Token,
@@ -428,8 +416,6 @@ public sealed class MediaSessionService : IDisposable
     {
         try
         {
-            // Cumulative delay is just over five seconds. Until it expires the
-            // previously valid title, cover and timeline remain untouched.
             foreach (var delay in new[] { 160, 300, 540, 900, 1_300, 1_900 })
             {
                 await Task.Delay(delay, source.Token);
@@ -562,7 +548,7 @@ public sealed class MediaSessionService : IDisposable
                 await memory.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
             }
 
-            return memory.ToArray();
+            return await ArtworkImageProcessor.CenterCropSquareAsync(memory.ToArray());
         }
         catch (OperationCanceledException)
         {

@@ -7,11 +7,6 @@ using WinRT;
 
 namespace FluidHUD.Services;
 
-/// <summary>
-/// Configurable Desktop Acrylic that can remain active for a no-activate overlay.
-/// The built-in Window.SystemBackdrop follows Window activation and can switch to
-/// its opaque fallback when the HUD is shown through SW_SHOWNOACTIVATE.
-/// </summary>
 public sealed class AcrylicBackdropController : IDisposable
 {
     private readonly Window _window;
@@ -72,10 +67,6 @@ public sealed class AcrylicBackdropController : IDisposable
         _window.Activated += OnWindowActivated;
     }
 
-    /// <summary>
-    /// Maps the user-facing 0.60..0.98 "glass density" setting to a deliberately
-    /// light tint. Acrylic supplies the blur; XAML only adds a very thin color veil.
-    /// </summary>
     public void UpdateDensity(double density)
     {
         if (_controller is null) return;
@@ -137,8 +128,8 @@ public sealed class AcrylicBackdropController : IDisposable
             var options = new DispatcherQueueOptions
             {
                 Size = Marshal.SizeOf<DispatcherQueueOptions>(),
-                ThreadType = 2,    // DQTYPE_THREAD_CURRENT
-                ApartmentType = 2  // DQTAT_COM_STA
+                ThreadType = 2,
+                ApartmentType = 2
             };
 
             var hResult = CreateDispatcherQueueController(

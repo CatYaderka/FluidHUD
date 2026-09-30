@@ -1,8 +1,5 @@
 namespace FluidHUD.Services;
 
-/// <summary>
-/// A small byte-bounded LRU. Artwork byte arrays are treated as immutable.
-/// </summary>
 public sealed class ArtworkCache : IDisposable
 {
     private sealed record Entry(string Key, byte[] Bytes);

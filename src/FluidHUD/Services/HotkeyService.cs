@@ -7,7 +7,7 @@ namespace FluidHUD.Services;
 
 public sealed class HotkeyService : IDisposable
 {
-    private const int HotkeyId = 0x4648; // "FH"
+    private const int HotkeyId = 0x4648;
 
     private readonly nint _hWnd;
     private readonly NativeMethods.WindowProc _windowProc;
@@ -65,7 +65,6 @@ public sealed class HotkeyService : IDisposable
         var nativeError = new Win32Exception(Marshal.GetLastWin32Error()).Message;
         error = $"Сочетание «{gesture.DisplayName}» уже занято системой или другой программой. {nativeError}";
 
-        // Best-effort rollback, so a failed edit does not disable the old shortcut.
         if (previous is not null)
         {
             var oldModifiers = (uint)previous.Modifiers | NativeMethods.ModNoRepeat;
