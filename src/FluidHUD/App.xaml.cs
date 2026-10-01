@@ -8,6 +8,9 @@ namespace FluidHUD;
 
 public partial class App : Application
 {
+    private const string InstanceMutexName = @"Local\CatYaderka.FluidHUD";
+    private const string ActivationEventName = @"Local\CatYaderka.FluidHUD.Activate";
+
     private readonly SettingsService _settingsService = new();
     private readonly StartupService _startupService = new();
 
@@ -20,6 +23,10 @@ public partial class App : Application
     private SettingsWindow? _settingsWindow;
     private HotkeyService? _hotkeyService;
     private Mutex? _singleInstanceMutex;
+    private EventWaitHandle? _activationEvent;
+    private CancellationTokenSource? _activationListenerCancellation;
+    private Thread? _activationListenerThread;
+    private int _pendingActivation;
     private bool _ownsSingleInstanceMutex;
     private bool _isShuttingDown;
 
@@ -81,6 +88,7 @@ public partial class App : Application
                 OpenSettings(isOnboarding: true);
             }
 
+            DispatchPendingActivation();
             _ = InitializeMediaSessionAsync();
         }
         catch (Exception ex)
@@ -102,14 +110,82 @@ public partial class App : Application
         {
             _singleInstanceMutex = new Mutex(
                 initiallyOwned: true,
-                name: @"Local\CatYaderka.FluidHUD",
+                name: InstanceMutexName,
                 createdNew: out _ownsSingleInstanceMutex);
-            return _ownsSingleInstanceMutex;
+
+            if (!_ownsSingleInstanceMutex)
+            {
+                SignalExistingInstance();
+                return false;
+            }
+
+            _activationEvent = new EventWaitHandle(
+                initialState: false,
+                mode: EventResetMode.AutoReset,
+                name: ActivationEventName);
+            _activationListenerCancellation = new CancellationTokenSource();
+            _activationListenerThread = new Thread(ListenForActivation)
+            {
+                IsBackground = true,
+                Name = "FluidHUD activation listener"
+            };
+            _activationListenerThread.Start();
+            return true;
         }
         catch
         {
             return true;
         }
+    }
+
+    private static void SignalExistingInstance()
+    {
+        for (var attempt = 0; attempt < 20; attempt++)
+        {
+            try
+            {
+                using var activationEvent = EventWaitHandle.OpenExisting(ActivationEventName);
+                _ = activationEvent.Set();
+                return;
+            }
+            catch (WaitHandleCannotBeOpenedException)
+            {
+                Thread.Sleep(50);
+            }
+        }
+    }
+
+    private void ListenForActivation()
+    {
+        var activationEvent = _activationEvent;
+        var cancellation = _activationListenerCancellation;
+        if (activationEvent is null || cancellation is null) return;
+
+        var handles = new WaitHandle[]
+        {
+            activationEvent,
+            cancellation.Token.WaitHandle
+        };
+
+        while (true)
+        {
+            var signaled = WaitHandle.WaitAny(handles);
+            if (signaled != 0 || _isShuttingDown) return;
+            Interlocked.Exchange(ref _pendingActivation, 1);
+            DispatchPendingActivation();
+        }
+    }
+
+    private void DispatchPendingActivation()
+    {
+        var overlay = _overlayWindow;
+        if (overlay is null || Volatile.Read(ref _pendingActivation) == 0) return;
+
+        _ = overlay.DispatcherQueue.TryEnqueue(() =>
+        {
+            if (Interlocked.Exchange(ref _pendingActivation, 0) == 0) return;
+            OpenSettings(isOnboarding: !_settings.OnboardingCompleted);
+        });
     }
 
     private async Task InitializeMediaSessionAsync()
@@ -228,6 +304,14 @@ public partial class App : Application
         if (_isShuttingDown) return;
         _isShuttingDown = true;
 
+        _activationListenerCancellation?.Cancel();
+        _activationEvent?.Set();
+        if (_activationListenerThread is not null &&
+            _activationListenerThread != Thread.CurrentThread)
+        {
+            _ = _activationListenerThread.Join(500);
+        }
+
         if (_settingsWindow is not null)
         {
             _settingsWindow.Closed -= OnSettingsWindowClosed;
@@ -268,6 +352,12 @@ public partial class App : Application
         try { _overlayWindow?.CloseForShutdown(); } catch { }
         _settingsWindow = null;
         _overlayWindow = null;
+
+        _activationEvent?.Dispose();
+        _activationEvent = null;
+        _activationListenerCancellation?.Dispose();
+        _activationListenerCancellation = null;
+        _activationListenerThread = null;
 
         if (_ownsSingleInstanceMutex)
         {
