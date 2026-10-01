@@ -56,6 +56,14 @@ Acrylic и Mica живут в DWM отдельно от XAML. Для обычн�
 
 ## Сборка
 
+Из обычной командной строки `cmd.exe`:
+
+```bat
+build.cmd
+```
+
+Из PowerShell:
+
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass -Force
 .\build.ps1
@@ -68,6 +76,13 @@ release\FluidHUD.exe
 ```
 
 Другие архитектуры:
+
+```bat
+build.cmd -Platform x86
+build.cmd -Platform ARM64
+```
+
+или из PowerShell:
 
 ```powershell
 .\build.ps1 -Platform x86
@@ -82,23 +97,30 @@ release\FluidHUD.exe
 
 Workflow `.github/workflows/build.yml` запускается при push в `main`/`master`, pull request и вручную через вкладку Actions.
 
-Матрица собирает две версии:
+Матрица на `windows-2022` и .NET SDK 8.0.408 собирает x64 и ARM64. Внутри каждого artifact исполняемый файл сохраняет исходное имя:
 
 ```text
-FluidHUD-win-x64.exe
-FluidHUD-win-arm64.exe
+FluidHUD.exe
+FluidHUD.exe.sha256
 ```
 
-Рядом с каждым EXE публикуется файл SHA-256. Артефакты обычных сборок хранятся 14 дней.
+Имя не меняется после publish, потому что WinUI resource identity и встроенный PRI создаются вместе с финальным EXE. Артефакты обычных сборок хранятся 14 дней.
 
-Тег `v*` создаёт GitHub Release и прикладывает обе архитектуры:
+Тег `v*` создаёт GitHub Release. Чтобы архитектурные файлы не конфликтовали по имени, Release содержит архивы, но внутри каждого остаётся неизменённый `FluidHUD.exe`:
+
+```text
+FluidHUD-win-x64.zip
+FluidHUD-win-arm64.zip
+```
+
+Новый релиз:
 
 ```powershell
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.0.2
+git push origin v1.0.2
 ```
 
-GitHub скачивает Actions artifacts как архивы автоматически, но в самом репозитории и workspace дополнительные ZIP-файлы не создаются.
+В самом репозитории и workspace ZIP-файлы не создаются.
 
 ## Первый запуск
 
@@ -161,8 +183,7 @@ FluidHUD/
 - seek отправляется в GSMTC в ticks;
 - настройки записываются через временный файл и атомарную замену;
 - второй экземпляр FluidHUD сразу завершается;
-- HUD выбирает монитор активного приложения, а не всегда основной экран;
-- listener громкости переподключается при смене устройства вывода.
+- HUD выбирает монитор активного приложения, а не всегда основной экран.
 
 ## Ограничения
 
@@ -172,7 +193,7 @@ Live streams и некоторые браузерные источники мо�
 
 Обычный topmost HUD работает поверх оконных и borderless-fullscreen приложений. Exclusive fullscreen, UAC, secure desktop и защищённое видео могут находиться выше любого desktop-окна.
 
-Журнал необработанных ошибок сохраняется локально:
+Если запуск завершился ошибкой, FluidHUD показывает системное окно с причиной и путём к журналу:
 
 ```text
 %LocalAppData%\FluidHUD\FluidHUD.log

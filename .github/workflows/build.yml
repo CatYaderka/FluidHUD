@@ -20,15 +20,17 @@ concurrency:
 jobs:
   build:
     name: Build ${{ matrix.rid }}
-    runs-on: windows-latest
+    runs-on: windows-2022
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: x64
             rid: win-x64
+            machine: "0x8664"
           - platform: ARM64
             rid: win-arm64
+            machine: "0xAA64"
 
     steps:
       - name: Checkout
@@ -37,16 +39,16 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 8.0.408
 
       - name: Publish
         shell: pwsh
-        run: .\build.ps1 -Platform "${{ matrix.platform }}" -OutputName "FluidHUD-${{ matrix.rid }}"
+        run: .\build.ps1 -Platform "${{ matrix.platform }}"
 
       - name: Validate executable
         shell: pwsh
         run: |
-          $target = "release\FluidHUD-${{ matrix.rid }}.exe"
+          $target = "release\FluidHUD.exe"
           $bytes = [System.IO.File]::ReadAllBytes($target)
           if ($bytes.Length -lt 10MB) {
             throw "Published executable is unexpectedly small."
@@ -59,20 +61,20 @@ jobs:
             throw "PE signature is invalid."
           }
           $machine = [BitConverter]::ToUInt16($bytes, $peOffset + 4)
-          $expected = if ("${{ matrix.rid }}" -eq "win-x64") { 0x8664 } else { 0xAA64 }
+          $expected = [Convert]::ToUInt16("${{ matrix.machine }}".Substring(2), 16)
           if ($machine -ne $expected) {
             throw "PE machine mismatch: expected $expected, got $machine."
           }
           $hash = (Get-FileHash $target -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash  $(Split-Path $target -Leaf)" | Set-Content "$target.sha256" -Encoding ascii
+          "$hash  FluidHUD.exe" | Set-Content "release\FluidHUD.exe.sha256" -Encoding ascii
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: FluidHUD-${{ matrix.rid }}
           path: |
-            release/FluidHUD-${{ matrix.rid }}.exe
-            release/FluidHUD-${{ matrix.rid }}.exe.sha256
+            release/FluidHUD.exe
+            release/FluidHUD.exe.sha256
           if-no-files-found: error
           retention-days: 14
 
@@ -90,12 +92,24 @@ jobs:
         with:
           pattern: FluidHUD-*
           path: release-assets
-          merge-multiple: true
+
+      - name: Package release assets
+        shell: bash
+        run: |
+          cd release-assets/FluidHUD-win-x64
+          zip -9 ../../FluidHUD-win-x64.zip FluidHUD.exe FluidHUD.exe.sha256
+          cd ../FluidHUD-win-arm64
+          zip -9 ../../FluidHUD-win-arm64.zip FluidHUD.exe FluidHUD.exe.sha256
+          cd ../..
+          sha256sum FluidHUD-win-x64.zip > FluidHUD-win-x64.zip.sha256
+          sha256sum FluidHUD-win-arm64.zip > FluidHUD-win-arm64.zip.sha256
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           files: |
-            release-assets/*.exe
-            release-assets/*.sha256
+            FluidHUD-win-x64.zip
+            FluidHUD-win-x64.zip.sha256
+            FluidHUD-win-arm64.zip
+            FluidHUD-win-arm64.zip.sha256
